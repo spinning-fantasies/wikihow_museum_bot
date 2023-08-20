@@ -4,4 +4,6 @@ images/
 include/
 lib/
 pyvenv.cfg
+.envarchive
 .env
+archive/
