@@ -5,20 +5,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-access_token=os.getenv("MASTODON_ACCESS_TOKEN")
-api_base_url='https://3615.computer'
+access_token = os.getenv("MASTODON_ACCESS_TOKEN")
+api_base_url = 'https://3615.computer'
 
 # upload test files to /api/v1/media
-TEST_FILES = [
-    "IMG_4061.JPG",
-    "IMG_4062.JPG"
+IMAGES_FILES = [
+    "IMG_4110.JPG"
 ]
-files_root = Path("./images/")
+
+files_root = Path("./archive/")
 media_ids = []
-for file in TEST_FILES:
+for file in IMAGES_FILES:
     test_file = files_root / file
     data = {
-        'description': '#WikiHow Museum' + file
+        'description': '#WikiHowMuseum' + file
     }
     files = {
         'file': (file, test_file.open('rb'), 'application/octet-stream')
@@ -34,8 +34,9 @@ for file in TEST_FILES:
 
 # after collecting the media ids, include them in the toot payload
 data = { 
-    "status": "This should be a status with multiple attached images!", 
-    "media_ids[]": media_ids
+    "status": "- tu savais que 80% de la déforestation mondiale est causée par la rentrée littéraire ?\n\n#WikihowMuseum", 
+    "media_ids[]": media_ids,
+    "visibility": "public"
 }
 
 url = "%s/api/v1/statuses" % (api_base_url)
@@ -43,3 +44,4 @@ r = requests.post(url,
         data=data, 
         headers={'Authorization': 'Bearer %s' % (access_token)})
 json_data = r.json()
+print(json_data)
