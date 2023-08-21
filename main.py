@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 access_token = os.getenv("MASTODON_ACCESS_TOKEN")
-api_base_url = 'https://3615.computer'
+api_base_url = os.getenv("MASTODON_INSTANCE")
 
 # upload test files to /api/v1/media
 IMAGES_FILES = [
-    "./IMG_4070.JPG"
+
 ]
 
 files_root = Path("./images/")
@@ -18,12 +18,12 @@ media_ids = []
 for file in IMAGES_FILES:
     test_file = files_root / file
     data = {
-        'description': '#WikiHowMuseum' + file
+        file
     }
     files = {
         'file': (file, test_file.open('rb'), 'application/octet-stream')
     }
-    url = "%s/api/v1/media" % (api_base_url)
+    url = "%s/api/v2/media" % (api_base_url)
     r = requests.post(url, 
         files=files, 
         headers={'Authorization': 'Bearer %s' % (access_token)})
@@ -35,11 +35,11 @@ for file in IMAGES_FILES:
 # after collecting the media ids, include them in the toot payload
 data = { 
     "status": """
-    - décrivez-vous en deux mots.
-    - dynamique et anticapitaliste.
-    
+
     #WikihowMuseum
-    """, 
+    """,
+    "description" : """
+    """,
     "media_ids[]": media_ids,
     "visibility": "public"
 }
