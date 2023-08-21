@@ -10,10 +10,10 @@ api_base_url = 'https://3615.computer'
 
 # upload test files to /api/v1/media
 IMAGES_FILES = [
-    "IMG_4110.JPG"
+    "./IMG_4070.JPG"
 ]
 
-files_root = Path("./archive/")
+files_root = Path("./images/")
 media_ids = []
 for file in IMAGES_FILES:
     test_file = files_root / file
@@ -34,7 +34,12 @@ for file in IMAGES_FILES:
 
 # after collecting the media ids, include them in the toot payload
 data = { 
-    "status": "- tu savais que 80% de la déforestation mondiale est causée par la rentrée littéraire ?\n\n#WikihowMuseum", 
+    "status": """
+    - décrivez-vous en deux mots.
+    - dynamique et anticapitaliste.
+    
+    #WikihowMuseum
+    """, 
     "media_ids[]": media_ids,
     "visibility": "public"
 }
