@@ -1,6 +1,9 @@
 import os
-from PIL import Image
+
 import pytesseract
+from PIL import Image, ImageFile
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 folder_path = './images/'
 # print(folder_path)
@@ -25,4 +28,3 @@ for file in file_list:
         textfile.write(text)
     
     print('OCR completed. Transcribed text saved to:', output_text_file)
-
