@@ -3,3 +3,4 @@ python-dotenv
 pytesseract
 datetime
 pathlib
+mastodon.py

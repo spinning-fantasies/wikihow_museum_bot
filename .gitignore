@@ -8,3 +8,4 @@ pyvenv.cfg
 archive/
 posted/
 texts
+temp_*
