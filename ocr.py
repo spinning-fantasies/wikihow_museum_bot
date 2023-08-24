@@ -21,7 +21,12 @@ for file in file_list:
     # print(text)
     
     # Path to the text file where you want to save the transcribed text
-    output_text_file = f'./texts/{file}.txt'
+    output_text_folder = './texts/' 
+    output_text_file = f'{output_text_folder}{file}.txt'
+    
+    # Create the destination folder if it doesn't exist
+    if not os.path.exists(output_text_folder):
+        os.makedirs(output_text_folder)
     
     # Write the transcribed text to the text file
     with open(output_text_file, 'w') as textfile:
