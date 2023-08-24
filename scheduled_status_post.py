@@ -1,51 +1,56 @@
 import os
-import requests
-import datetime
-import pytz
-import time
+import mastodon
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Mastodon API endpoint and access token
+# Mastodon instance URL
+instance_url = os.getenv("MASTODON_INSTANCE")
+# Your Mastodon access token
 access_token = os.getenv("MASTODON_ACCESS_TOKEN")
-api_base_url = os.getenv("MASTODON_INSTANCE")
+# Folder containing images
+image_folder = 'temp_images'
 
-# Create a session with the Mastodon API instance
-session = requests.Session()
-session.headers.update({'Authorization': f'Bearer {access_token}'})
+# Initialize Mastodon API
+client = mastodon.Mastodon(
+    access_token=access_token,
+    api_base_url=instance_url
+)
 
-# Content of the post
-post_content = "Hello, this is a scheduled post in Europe/Paris timezone !"
+def post_image_with_warning(image_path, content_warning, sensitive=True):
+    # Upload media
+    media = client.media_post(image_path, description=content_warning, sensitive=sensitive)
 
-# Convert current time to Central European Timezone (CET)
-cet_timezone = pytz.timezone('Europe/Paris')  # CET is also known as Europe/Paris
-current_time = datetime.datetime.now(pytz.utc)
-cet_current_time = current_time.astimezone(cet_timezone)
+    # Compose the status
+    status = f"Image with content warning: {content_warning}"
 
-# Calculate the scheduled time (e.g., post after 1 hour)
-scheduled_time = cet_current_time + datetime.timedelta(seconds=42)
+    # Post the status with the uploaded media
+    client.status_post(status, media_ids=[media])
 
-# Convert the scheduled time to UTC
-scheduled_time_utc = scheduled_time.astimezone(pytz.utc)
+    print("Image posted successfully!")
 
-# Prepare the data for the API request
-data = {
-    "status": post_content,
-    "scheduled_at": scheduled_time_utc.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-}
+def schedule_posts():
+    if not os.path.exists(image_folder):
+        print("Image folder not found.")
+        return
 
-# API endpoint for creating a scheduled status
-api_url = f"{api_base_url}/api/v1/statuses"
+    content_warning = "Sensitive Content Warning"
+    sensitive = True
+    interval_hours = 12  # Interval between posts
 
-# Make the API request to schedule the post
-response = session.post(api_url, json=data)
+    image_paths = [os.path.join(image_folder, filename) for filename in os.listdir(image_folder) if filename.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
-if response.status_code == 200:
-    print("Post scheduled successfully!")
-else:
-    print(f"Error scheduling post. Status code: {response.status_code}")
-    print(response.text)
+    current_time = datetime.now(timezone.utc)
 
-# Wait for a bit to allow the scheduled time to arrive
-time.sleep(10)
+    for idx, image_path in enumerate(image_paths):
+        scheduled_time = current_time + timedelta(hours=idx * interval_hours)
+        client.status_post(
+            "Scheduled image post",
+            media_ids=[client.media_post(image_path)["id"]],
+            scheduled_at=scheduled_time
+        )
+        print(f"Image {image_path} scheduled for {scheduled_time}")
+
+if __name__ == "__main__":
+    schedule_posts()
