@@ -4,6 +4,8 @@ import json
 import pytesseract
 from PIL import Image, ImageFile
 from dotenv import load_dotenv
+from datetime import datetime, timedelta, timezone
+
 
 load_dotenv()
 
@@ -48,6 +50,13 @@ for file in file_list:
 
     # print(media_id)
 
+    # Set schedule
+    interval_hours = 6  # Interval between posts
+    current_time = datetime.now(timezone.utc)
+    scheduled_time = current_time + timedelta(hours= 1 * interval_hours)
+
+
+
     # Create a new status (tweet) with content warning and description
     status = "Wikihow Museum, Meme"
     description = text
@@ -60,7 +69,8 @@ for file in file_list:
         'sensitive': True,
         'spoiler_text': status,
         'visibility': 'public',  # Set the visibility as needed
-        'description': description
+        'description': description,
+        'scheduled_at': scheduled_time
     }
     
     print(status_payload)
