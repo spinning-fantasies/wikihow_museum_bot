@@ -26,7 +26,7 @@ for file in file_list:
     print(text)
     
     # Path to the text file where you want to save the transcribed text
-    output_text_folder = './texts/' 
+    output_text_folder = './temp_texts/' 
     output_text_file = f'{output_text_folder}{file}.txt'
     
     # Create the destination folder if it doesn't exist
@@ -41,7 +41,7 @@ for file in file_list:
 
     print(image_path)
     
-    image_files = {'file': (f'images/{file}', open(image_path, 'rb'))}
+    image_files = {'file': (f'temp_images/{file}', open(image_path, 'rb'))}
     image_response = requests.post(f'{api_base_url}/api/v1/media', headers=image_headers, files=image_files)
     image_data = json.loads(image_response.content)
     media_id = image_data.get('id')
