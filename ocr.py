@@ -39,14 +39,64 @@ for file in file_list:
     'Authorization': f'Bearer {access_token}'
     }
 
-    print(image_path)
     
     image_files = {'file': (f'temp_images/{file}', open(image_path, 'rb'))}
     image_response = requests.post(f'{api_base_url}/api/v1/media', headers=image_headers, files=image_files)
+    print(image_response)
     image_data = json.loads(image_response.content)
     media_id = image_data.get('id')
 
-    print(media_id)
+    # print(media_id)
+
+    # Create a new status (tweet) with content warning and description
+    status = "Wikihow Museum, Meme"
+    description = text
+    cw_status = text
+
+    # Create the status payload
+    status_payload = {
+        'status': cw_status + "#WikihowMuseum",
+        'media_ids': [media_id],
+        'sensitive': True,
+        'spoiler_text': status,
+        'visibility': 'public',  # Set the visibility as needed
+        'description': description
+    }
+    
+    print(status_payload)
+
+    # Post the status
+    status_headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+
+    status_response = requests.post(f'{api_base_url}/api/v1/statuses', headers=status_headers, data=json.dumps(status_payload))
+
+    if status_response.status_code == 200:
+        print("Status posted successfully!")
+        
+        text_source_path = f'temp_texts/{file}.txt'  # Replace with the actual source file path
+        image_source_path = f'temp_images/{file}'  # Replace with the actual source file path
+        destination_folder = 'temp_posted'  # Replace with the actual destination folder path
+        
+        # Create the destination folder if it doesn't exist
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
+            
+        # Construct the full path for the destination
+        text_destination_path = os.path.join(destination_folder, os.path.basename(text_source_path))
+        image_destination_path = os.path.join(destination_folder, os.path.basename(image_source_path))
+        
+        # Move the file to the destination
+        os.rename(text_source_path, text_destination_path)
+        print(f"File '{text_source_path}' moved to '{text_destination_path}'")
+        
+        os.rename(image_source_path, image_destination_path)
+        print(f"File '{image_source_path}' moved to '{image_destination_path}'")
+        
+    else:
+        print("Failed to post status:", status_response.content)
     
     # Write the transcribed text to the text file
     #with open(output_text_file, 'w') as textfile:
